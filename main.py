@@ -6,27 +6,24 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
-import time
 import random
 import inputDataGen
+from paths import *
 
-PATH = r"C:\Users\hlsmirn\PycharmProjects\OISelTest\WebDrivers\chromedriver.exe"
-CV_PATH = r"C:\Users\hlsmirn\PycharmProjects\OISelTest\InputFiles\tmp.doc"
-
-driver = webdriver.Chrome(PATH)
-driver.get('https://www.orioninc.com')
+driver = webdriver.Chrome(DRIVER_PATH)
+driver.get(MAIN_PAGE_LINK)
 actions = ActionChains(driver)
 
 
 def accept_cookie_policy():
-    if driver.find_element(By.ID, "hs-eu-cookie-confirmation"):
-        driver.find_element(By.XPATH, "//*[@id='hs-eu-confirmation-button']").click()
+    if driver.find_element(By.XPATH, COOKIE_CONFIRM_BUTTON):
+        driver.find_element(By.XPATH, COOKIE_CONFIRM_BUTTON).click()
 
 
 def do_careers_navigation():
-    menu = driver.find_element(By.CSS_SELECTOR, ".nav")
-    company_submenu = driver.find_element(By.CSS_SELECTOR, "li.nav-item:nth-child(9)")
-    company_careers_submenu = driver.find_element(By.CSS_SELECTOR, "a.nav-link:nth-child(6)")
+    menu = driver.find_element(By.XPATH, NAV_BAR_PATH)
+    company_submenu = driver.find_element(By.XPATH, COMPANY_SUBMENU)
+    company_careers_submenu = driver.find_element(By.XPATH, COMPANY_CAREERS_SUBMENU)
 
     actions.move_to_element(menu)
     actions.move_to_element(company_submenu)
@@ -36,26 +33,25 @@ def do_careers_navigation():
 
 def do_regions_scroll():
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    regions_block = driver.find_element(By.CSS_SELECTOR, ".wp-container-6")
+    regions_block = driver.find_element(By.XPATH, REGIONS_BLOCK)
     cord = regions_block.location.values()
 
     driver.execute_script(f"window.scroll({cord.mapping.get('x')}, {cord.mapping.get('y')});")
-    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".wp-image-11476")))
-    regions_block.find_element(By.CSS_SELECTOR, ".wp-image-11476").click()
-
+    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, LATIN_AMERICA_IMG)))
+    regions_block.find_element(By.XPATH, LATIN_AMERICA_IMG).click()
 
 def search_vacancy():
-    search_field_xpath = "/html/body/main/div[2]/div/div/div[2]/div[1]/form/input[1]"
-    search_field = driver.find_element(By.XPATH, search_field_xpath)
+
+    search_field = driver.find_element(By.XPATH, SEARCH_FIELD)
     search_field.click()
-    actions.send_keys_to_element(search_field, "Robot+Python").send_keys(Keys.ENTER).perform()
+    actions.send_keys_to_element(search_field, SEARCH_REQUEST_BODY).send_keys(Keys.ENTER).perform()
 
 
 def select_vacancy():
     try:
-        nec_vacancy = driver.find_element(By.PARTIAL_LINK_TEXT, "Robot+Python")
+        nec_vacancy = driver.find_element(By.PARTIAL_LINK_TEXT, SEARCH_REQUEST_BODY)
     except NoSuchElementException:
-        print("no 'Robot+Python' vacancy were found")
+        print(SEARCH_ERROR_MSG)
         return
 
     nec_vacancy.click()
@@ -65,18 +61,18 @@ def apply_now():
     in_data = inputDataGen.InputFieldGenerator()
     full_name = in_data.get_full_name()
 
-    driver.find_element(By.PARTIAL_LINK_TEXT, "Apply Now").click()
+    driver.find_element(By.PARTIAL_LINK_TEXT, APPLY_BUTTON).click()
 
-    actions.send_keys_to_element(driver.find_element(By.ID, "input_7_2"), full_name[0])  # first name
-    actions.send_keys_to_element(driver.find_element(By.ID, "input_7_3"), full_name[1])  # last name
+    actions.send_keys_to_element(driver.find_element(By.XPATH, FIRSTNAME), full_name[0])
+    actions.send_keys_to_element(driver.find_element(By.XPATH, LASTNAME), full_name[1])
 
-    actions.send_keys_to_element(driver.find_element(By.ID, "input_7_4"), in_data.get_email())
-    actions.send_keys_to_element(driver.find_element(By.ID, "input_7_5"), in_data.get_phone())
-    actions.send_keys_to_element(driver.find_element(By.ID, "input_7_7"), in_data.get_state())
-    actions.send_keys_to_element(driver.find_element(By.ID, "input_7_8"), in_data.get_city())
-    actions.send_keys_to_element(driver.find_element(By.ID, "input_7_9"), in_data.get_zip())
+    actions.send_keys_to_element(driver.find_element(By.XPATH, EMAIL), in_data.get_email())
+    actions.send_keys_to_element(driver.find_element(By.XPATH, PHONE), in_data.get_phone())
+    actions.send_keys_to_element(driver.find_element(By.XPATH, STATE), in_data.get_state())
+    actions.send_keys_to_element(driver.find_element(By.XPATH, CITY), in_data.get_city())
+    actions.send_keys_to_element(driver.find_element(By.XPATH, ZIP), in_data.get_zip())
 
-    actions.send_keys_to_element(driver.find_element(By.ID, "input_7_11"), in_data.get_text())
+    actions.send_keys_to_element(driver.find_element(By.XPATH, SKILL_SUMMARY), in_data.get_text())
 
     actions.perform()
     actions.release()
@@ -86,30 +82,30 @@ def apply_now():
 
     actions.reset_actions()
 
-    actions.send_keys_to_element(driver.find_element(By.ID, "input_7_17"), in_data.get_text())
-    actions.click(driver.find_element(By.XPATH, '/html/body/main/article/div/div/div/div/div/div/form/div[2]/ul/li[13]/div/ul/li/label'))
-    actions.click(driver.find_element(By.XPATH, '/html/body/main/article/div/div/div/div/div/div/form/div[3]/input[1]'))
+    actions.send_keys_to_element(driver.find_element(By.XPATH, ABOUT_US), in_data.get_text())
+    actions.click(driver.find_element(By.XPATH, SAVE_INFO_CHECKBOX))
+    actions.click(driver.find_element(By.XPATH, SUBMIT_APPLICATION_BUTTON))
 
     actions.perform()
 
 def select_country():
-    driver.find_element(By.CSS_SELECTOR, "b.button").click()
+    driver.find_element(By.XPATH, COUNTRY_BTN).click()
     driver.find_element(By.CSS_SELECTOR,
                         f".selectric-scroll > ul:nth-child(1) > li:nth-child({random.randrange(2, 249)})").click()
 
 
 def load_file():
-    load_zone = driver.find_element(By.ID, "input_7_12")
+    load_zone = driver.find_element(By.XPATH, FILE_LOAD_ZONE)
 
     try:
         load_zone.send_keys(CV_PATH)
     except:
-        print("error during file upload")
+        print(FILE_ERROR_MSG)
         return
 
 
 def kill_proc():
-    os.system("taskkill /f /im chromedriver.exe")
+    os.system(KILL_PROC_CMD)
 
 
 accept_cookie_policy()

@@ -40,8 +40,8 @@ def do_regions_scroll():
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, LATIN_AMERICA_IMG)))
     regions_block.find_element(By.XPATH, LATIN_AMERICA_IMG).click()
 
-def search_vacancy():
 
+def search_vacancy():
     search_field = driver.find_element(By.XPATH, SEARCH_FIELD)
     search_field.click()
     actions.send_keys_to_element(search_field, SEARCH_REQUEST_BODY).send_keys(Keys.ENTER).perform()
